@@ -6,12 +6,18 @@ import './style.css';
 
 const cardProduct = document.querySelector('section .products');
 
-const createElementLoad = () => {
-  const h1 = globalThis.document.createElement('h1');
+const createElementLoad = (param = 'elError') => {
+  const elError = globalThis.document.createElement('h1');
 
-  h1.innerText = 'carregando...';
-  h1.className = 'loading';
-  cardProduct.appendChild(h1);
+  if (param === 'error') {
+    elError.innerText = 'Algum erro ocorreu, recarregue a página e tente novamente';
+    elError.className = 'error';
+  } else {
+    elError.innerText = 'carregando...';
+    elError.className = 'loading';
+  }
+
+  cardProduct.appendChild(elError);
 };
 
 const removeElementLoad = () => document.querySelector('.loading').remove();
@@ -23,7 +29,8 @@ const getApi = async () => {
     listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
     removeElementLoad();
   } catch (error) {
-    throw new Error(error.message);
+    removeElementLoad();
+    createElementLoad('error');
   }
 };
 
