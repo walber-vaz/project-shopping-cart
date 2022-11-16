@@ -12,9 +12,23 @@ const createElementLoad = () => {
   h1.innerText = 'carregando...';
   h1.className = 'loading';
   cardProduct.appendChild(h1);
-}
+};
 
-const listProductInDOM = await fetchProductsList('computador');
-listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
+const removeElementLoad = () => document.querySelector('.loading').remove();
 
-document.querySelector('.cep-button').addEventListener('click', searchCep);
+const getApi = async () => {
+  createElementLoad();
+  try {
+    const listProductInDOM = await fetchProductsList('computador');
+    listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
+    removeElementLoad();
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+window.onload = () => {
+  document.querySelector('.cep-button').addEventListener('click', searchCep);
+
+  getApi();
+};
