@@ -1,5 +1,5 @@
 export const fetchProduct = () => {
-  // 
+  // Codigo
 };
 
 export const fetchProductsList = async (query) => {
@@ -7,7 +7,7 @@ export const fetchProductsList = async (query) => {
 
   const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${query}`);
   const data = await res.json();
-  const obj =  data.results;
+  const obj = data.results;
 
   return obj;
 };
