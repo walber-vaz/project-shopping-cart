@@ -1,10 +1,11 @@
 import { searchCep } from './helpers/cepFunctions';
-import { fetchProductsList } from './helpers/fetchFunctions';
-import { createProductElement } from './helpers/shopFunctions';
+import { saveCartID } from './helpers/cartFunctions';
+import { fetchProductsList, fetchProduct } from './helpers/fetchFunctions';
+import { createProductElement, createCartProductElement } from './helpers/shopFunctions';
 
 import './style.css';
 
-const cardProduct = document.querySelector('section .products');
+const cardProduct = globalThis.document.querySelector('section .products');
 
 const createElementLoad = (param = 'elError') => {
   const elError = globalThis.document.createElement('h1');
@@ -20,14 +21,34 @@ const createElementLoad = (param = 'elError') => {
   cardProduct.appendChild(elError);
 };
 
-const removeElementLoad = () => document.querySelector('.loading').remove();
+const removeElementLoad = () => {
+  const loading = document.querySelector('.loading');
+  return loading.remove();
+};
+
+const addCart = async (window) => {
+  const id = window.target.parentNode.firstChild.innerText;
+  const getCartClass = globalThis.document.querySelector('.cart__products');
+
+  saveCartID(id);
+  const fetchIdProduct = await fetchProduct(id);
+  const cartProduct = createCartProductElement(fetchIdProduct);
+  getCartClass.appendChild(cartProduct);
+};
+
+const addProductInCart = () => {
+  const btns = globalThis.document.querySelectorAll('.product__add');
+
+  [...btns].map((btn) => btn.addEventListener('click', addCart));
+};
 
 const getApi = async () => {
   createElementLoad();
   try {
     const listProductInDOM = await fetchProductsList('computador');
-    listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
     removeElementLoad();
+    listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
+    addProductInCart();
   } catch (error) {
     removeElementLoad();
     createElementLoad('error');
