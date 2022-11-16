@@ -1,11 +1,12 @@
 import { searchCep } from './helpers/cepFunctions';
-import { saveCartID } from './helpers/cartFunctions';
+import { saveCartID, getSavedCartIDs } from './helpers/cartFunctions';
 import { fetchProductsList, fetchProduct } from './helpers/fetchFunctions';
 import { createProductElement, createCartProductElement } from './helpers/shopFunctions';
 
 import './style.css';
 
 const cardProduct = globalThis.document.querySelector('section .products');
+const cartListProduct = document.querySelector('.cart__products');
 
 const createElementLoad = (param = 'elError') => {
   const elError = globalThis.document.createElement('h1');
@@ -42,6 +43,21 @@ const addProductInCart = () => {
   [...btns].map((btn) => btn.addEventListener('click', addCart));
 };
 
+const saveListCartProductInLocalStorage = async () => {
+  const idsProducts = await getSavedCartIDs();
+
+  const awesomeIds = await idsProducts.map((id) => {
+    const idProductFetch = fetchProduct(id);
+    return idProductFetch;
+  });
+
+  Promise.all(awesomeIds)
+    .then((res) => res.map((product) => {
+      const addProduct = createCartProductElement(product);
+      return cartListProduct.appendChild(addProduct);
+    }));
+};
+
 const getApi = async () => {
   createElementLoad();
   try {
@@ -59,4 +75,5 @@ window.onload = () => {
   document.querySelector('.cep-button').addEventListener('click', searchCep);
 
   getApi();
+  saveListCartProductInLocalStorage();
 };
