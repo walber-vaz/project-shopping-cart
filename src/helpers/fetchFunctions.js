@@ -1,13 +1,13 @@
-
 export const fetchProduct = () => {
-  // seu código aqui
+  // 
 };
 
-export const fetchProductsList = async (product) => {
-  if (!product) throw new Error('Termo de busca não informado');
+export const fetchProductsList = async (query) => {
+  if (!query) throw new Error('Termo de busca não informado');
 
-  const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${product}`);
+  const res = await fetch(`https://api.mercadolibre.com/sites/MLB/search?q=${query}`);
   const data = await res.json();
+  const obj =  data.results;
 
-  return data.results;
+  return obj;
 };
