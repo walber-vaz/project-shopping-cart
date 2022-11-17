@@ -5,6 +5,7 @@ import { createProductElement, createCartProductElement } from './helpers/shopFu
 
 import './style.css';
 
+const fragment = new DocumentFragment();
 const cardProduct = globalThis.document.querySelector('section .products');
 const cartListProduct = document.querySelector('.cart__products');
 
@@ -19,7 +20,8 @@ const createElementLoad = (param = 'elError') => {
     elError.className = 'loading';
   }
 
-  cardProduct.appendChild(elError);
+  fragment.appendChild(elError);
+  cardProduct.appendChild(fragment);
 };
 
 const removeElementLoad = () => {
@@ -34,7 +36,8 @@ const addCart = async (window) => {
   saveCartID(id);
   const fetchIdProduct = await fetchProduct(id);
   const cartProduct = createCartProductElement(fetchIdProduct);
-  getCartClass.appendChild(cartProduct);
+  fragment.appendChild(cartProduct);
+  getCartClass.appendChild(fragment);
 };
 
 const addProductInCart = () => {
@@ -54,7 +57,9 @@ const saveListCartProductInLocalStorage = async () => {
   Promise.all(awesomeIds)
     .then((res) => res.map((product) => {
       const addProduct = createCartProductElement(product);
-      return cartListProduct.appendChild(addProduct);
+      fragment.appendChild(addProduct);
+      fragment.appendChild(fragment);
+      return cartListProduct.appendChild(fragment);
     }));
 };
 
@@ -63,7 +68,8 @@ const getApi = async () => {
   try {
     const listProductInDOM = await fetchProductsList('computador');
     removeElementLoad();
-    listProductInDOM.map((el) => cardProduct.appendChild(createProductElement(el)));
+    listProductInDOM.map((el) => fragment.appendChild(createProductElement(el)));
+    cardProduct.appendChild(fragment);
     addProductInCart();
   } catch (error) {
     removeElementLoad();
@@ -73,7 +79,6 @@ const getApi = async () => {
 
 window.onload = () => {
   document.querySelector('.cep-button').addEventListener('click', searchCep);
-
   getApi();
   saveListCartProductInLocalStorage();
 };
