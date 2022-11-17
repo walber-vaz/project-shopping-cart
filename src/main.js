@@ -6,22 +6,36 @@ import { createProductElement, createCartProductElement } from './helpers/shopFu
 import './style.css';
 
 const fragment = new DocumentFragment();
-const cardProduct = globalThis.document.querySelector('section .products');
+const cardProduct = document.querySelector('.products');
 const cartListProduct = document.querySelector('.cart__products');
+const classTotalPrice = document.querySelector('.total-price');
 
-const createElementLoad = (param = 'elError') => {
-  const elError = globalThis.document.createElement('h1');
+let sumTotalCartList = 0;
+
+const sumTotal = (product) => {
+  const { price } = product;
+  sumTotalCartList += parseFloat(price);
+  classTotalPrice.innerText = sumTotalCartList.toFixed(2);
+};
+
+const subTotal = (product) => {
+  const { price } = product;
+  sumTotalCartList -= parseFloat(price);
+  classTotalPrice.innerText = sumTotalCartList.toFixed(2);
+};
+
+const createElementLoad = (param = 'elementError') => {
+  const elementError = document.createElement('h1');
 
   if (param === 'error') {
-    elError.innerText = 'Algum erro ocorreu, recarregue a página e tente novamente';
-    elError.className = 'error';
+    elementError.innerText = 'Algum erro ocorreu, recarregue a página e tente novamente';
+    elementError.className = 'error';
   } else {
-    elError.innerText = 'carregando...';
-    elError.className = 'loading';
+    elementError.innerText = 'carregando...';
+    elementError.className = 'loading';
   }
 
-  fragment.appendChild(elError);
-  cardProduct.appendChild(fragment);
+  cardProduct.appendChild(elementError);
 };
 
 const removeElementLoad = () => {
@@ -29,37 +43,83 @@ const removeElementLoad = () => {
   return loading.remove();
 };
 
-const addCart = async (window) => {
-  const id = window.target.parentNode.firstChild.innerText;
-  const getCartClass = globalThis.document.querySelector('.cart__products');
+const deletePriceTotalCart = (product) => {
+  const btnDelProductCart = document.querySelectorAll('.cart__product');
+  btnDelProductCart[btnDelProductCart.length - 1]
+    .addEventListener('click', () => {
+      subTotal(product);
+    });
+};
 
-  saveCartID(id);
+const createElementInCartProduct = async (id) => {
+  const getCartClass = document.querySelector('.cart__products');
+
   const fetchIdProduct = await fetchProduct(id);
   const cartProduct = createCartProductElement(fetchIdProduct);
+
   fragment.appendChild(cartProduct);
   getCartClass.appendChild(fragment);
+
+  sumTotal(fetchIdProduct);
+  deletePriceTotalCart(fetchIdProduct);
+};
+
+const addCart = (window) => {
+  const id = window.target.parentNode.firstChild.innerText;
+
+  saveCartID(id);
+  createElementInCartProduct(id);
 };
 
 const addProductInCart = () => {
-  const btns = globalThis.document.querySelectorAll('.product__add');
+  const btns = document.querySelectorAll('.product__add');
 
   [...btns].map((btn) => btn.addEventListener('click', addCart));
 };
 
-const saveListCartProductInLocalStorage = async () => {
+const getAsyncProductSaved = async () => {
   const idsProducts = await getSavedCartIDs();
 
-  const awesomeIds = await idsProducts.map((id) => {
+  return idsProducts.map((id) => {
     const idProductFetch = fetchProduct(id);
     return idProductFetch;
   });
+};
+
+const createCardListCart = (products) => {
+  products.forEach((product) => {
+    const addProduct = createCartProductElement(product);
+    fragment.appendChild(addProduct);
+    cartListProduct.appendChild(fragment);
+    sumTotal(product);
+  });
+};
+
+const savedPriceCartlist = (products) => {
+  const getClass = document.querySelectorAll('.cart__product');
+
+  getClass.forEach((product, indice) => {
+    product.addEventListener('click', () => {
+      subTotal(products[indice]);
+    });
+  });
+};
+
+const saveListCartProductInLocalStorage = async () => {
+  const awesomeIds = await getAsyncProductSaved();
 
   Promise.all(awesomeIds)
-    .then((res) => res.map((product) => {
-      const addProduct = createCartProductElement(product);
-      fragment.appendChild(addProduct);
-      return cartListProduct.appendChild(fragment);
-    }));
+    .then((res) => {
+      createCardListCart(res);
+      savedPriceCartlist(res);
+    });
+};
+
+const calcPricecart = () => {
+  const btns = document.querySelectorAll('.product__add');
+  btns.forEach((btn) => {
+    btn.addEventListener('click', addCart);
+  });
 };
 
 const getApi = async () => {
@@ -70,6 +130,7 @@ const getApi = async () => {
     listProductInDOM.map((el) => fragment.appendChild(createProductElement(el)));
     cardProduct.appendChild(fragment);
     addProductInCart();
+    calcPricecart();
   } catch (error) {
     removeElementLoad();
     createElementLoad('error');
