@@ -58,7 +58,6 @@ const saveListCartProductInLocalStorage = async () => {
     .then((res) => res.map((product) => {
       const addProduct = createCartProductElement(product);
       fragment.appendChild(addProduct);
-      fragment.appendChild(fragment);
       return cartListProduct.appendChild(fragment);
     }));
 };
