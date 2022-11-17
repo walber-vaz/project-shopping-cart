@@ -137,8 +137,9 @@ const getApi = async () => {
   }
 };
 
+document.querySelector('.cep-button').addEventListener('click', searchCep);
+
 window.onload = () => {
-  document.querySelector('.cep-button').addEventListener('click', searchCep);
   getApi();
   saveListCartProductInLocalStorage();
 };
