@@ -10,7 +10,7 @@ export const getAddress = async (cep) => {
     .catch(() => {
       throw new Error('CEP não encontrado');
     });
-  
+
   return allPromises;
 };
 
